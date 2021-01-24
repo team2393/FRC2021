@@ -1,0 +1,19 @@
+# Settings when target is 'far'
+# Format is  NAME SPACE VALUE
+# Can also use 'tab' instead of 'space',
+# but don't do that.
+HueMin 60
+HueMax 90.0
+SatMin 120
+SatMax 255
+ValMin 70
+ValMax 255
+AspectMin 1.5
+AspectMax 6
+AreaMin 0
+AreaMax 7000
+FullnessMin 5
+FullnessMax 40
+Teleop Hood Setpoint 150
+Shooter RPM 5500
+Camera Target Mode  true

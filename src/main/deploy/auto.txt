@@ -1,0 +1,93 @@
+# Auto-no-mouse Moves
+
+# -----------------------------------------------------
+Auto Smurftrack
+# Poses are a list of X Y Heading
+Poses
+Pose 1 0 0
+Pose 1.5 -0.5 -90
+Pose 1 -1.0 -180
+Pose 0 -1.0 -180
+Pose -0.5 -0.5 90
+End 0 0 0
+
+
+
+# -----------------------------------------------------
+Auto Shoot Move Back
+Hood 140
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+ReversePoses
+End -0.5 0 0
+
+
+# -----------------------------------------------------
+Auto Target Pickup Target
+Hood 140
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+IntakeDown
+ReversePoses
+#Pose -1 -0.6 57 
+#Pose -1.5 -1.5 27
+Pose -2.6 -1.8 0
+End -4 -1.8 0
+IntakeMid
+Poses
+End  4 1.8 0
+RotateToTarget
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+
+
+
+
+# -----------------------------------------------------
+Auto Right Pickup Target
+Hood 140
+IntakeDown
+ReversePoses
+End -4 0 0
+IntakeMid
+Poses
+End  4 1.8 0
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+
+
+# -----------------------------------------------------
+Auto Right Pickup Right of Target
+Hood 140
+IntakeDown
+ReversePoses
+End -3.1 0 0
+IntakeMid
+Poses
+End  3.1 0.9 10
+RotateToTarget
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot
+Wait 0.1
+Shoot

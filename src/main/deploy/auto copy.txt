@@ -1,0 +1,105 @@
+# Auto-no-mouse Moves
+
+# Define a move ---------------------------------------
+Auto Move 0.5m
+# Trajectory from Start position (X 0, Y 0, Heading 0)
+# moving 0.5 meters forward (along the X axis)
+Trajectory
+# Trajectory might contain intermediate "Point X Y" points
+End 0.5 0 0
+
+
+# -----------------------------------------------------
+Auto Smurftrack
+# Poses are a list of X Y Heading
+Poses
+Pose 1 0 0
+Pose 1.5 -0.5 -90
+Pose 1 -1.0 -180
+Pose 0 -1.0 -180
+Pose -0.5 -0.5 90
+End 0 0 0
+
+
+# -----------------------------------------------------
+Auto Racetrack
+Poses
+Pose 2 0 0
+Pose 2.5 -0.5 -90
+Pose 2 -1.0 -180
+Pose 0 -1.0 -180
+Pose -0.5 -0.5 90
+End 0 0 0
+
+
+# -----------------------------------------------------
+Auto Turn in place
+TurnToHeading 10
+TurnToHeading -10
+Wait 1.5
+TurnToHeading 10
+TurnToHeading -10
+TurnToHeading 10
+TurnToHeading -10
+
+
+#------------------------------------------------------
+Auto PickupAndShoot
+# IntakeDown
+#Hood 145
+#Wait 1
+#Hood 140
+#Wait 1
+#Hood 130
+#Wait 1
+#IntakeMid
+Shoot
+Wait 2
+# IntakeUp
+Shoot
+Shoot
+
+# -----------------------------------------------------
+Auto 0.5 and Back 0.5
+Trajectory
+End 0.5 0 0
+ReverseTrajectory
+End -0.5 0 0
+
+
+# -----------------------------------------------------
+Auto Slight Left and back
+Trajectory
+End 3 0.5 0
+ReverseTrajectory
+End -3 -0.5 0
+
+
+# -----------------------------------------------------
+Auto Pathweaver Test
+PathWeaver PathWeaver/Paths/Test.path
+
+
+# -----------------------------------------------------
+Auto Pick 2 and shoot
+Hood 140
+Shoot
+Wait 0.5
+Shoot
+IntakeDown
+ReversePoses
+Pose -1.4 -1 47
+Pose -2.2 -1.7 13
+End -4 -1.8 0
+IntakeMid
+Poses
+End  4 1.8 0
+Shoot
+Wait 0.5
+Shoot
+Wait 0.5
+Shoot
+Wait 0.5
+Shoot
+Wait 0.5
+Shoot

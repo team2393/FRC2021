@@ -1,0 +1,7 @@
+HueMin  0
+HueMax  1
+SatMin  0
+SatMax 1
+ValMin  0
+ValMax 1
+Camera Target Mode  false
