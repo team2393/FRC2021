@@ -90,6 +90,9 @@ public class DriveTrain extends SubsystemBase
   // Track current position based on gyro and encoders
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
 
+  // Physics model of the drive train for simulation
+  // TODO private final DifferentialDrivetrainSim simulation;
+
   public DriveTrain()
   {
     // Reset & configure motors
@@ -124,6 +127,35 @@ public class DriveTrain extends SubsystemBase
     // SmartDashboard.putData("Heading PID", heading_pid);
 
     reset();
+
+    // TODO Create simulation
+    //double wheelRadiusMeters = Units.inchesToMeters(8);
+    //double massKg = 120;
+  
+    // Falcon encoder counts 2048 ticks per turn
+    // motor_turns_per_meter = TICKS_PER_METER / 2048
+    // wheel_turns_per_meter = 1 meter / wheelRadiusMeters
+    // gearing = motor_turns / wheel_turn
+    //double gearing = (TICKS_PER_METER / 2048)  / ( 1 / wheelRadiusMeters); 
+
+    // Moment of inertia (wild guess)
+    //double jKgMetersSquared = 2;
+    
+    //simulation = new DifferentialDrivetrainSim(
+    //  // Gearbox with 2 falcon motors per gear
+    //  DCMotor.getFalcon500(2),
+    //  gearing,
+    //  jKgMetersSquared,
+    //  massKg,
+    //  wheelRadiusMeters,
+    //  kinematics.trackWidthMeters,
+      // The standard deviations for measurement noise from example
+      // https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/drivesim-tutorial/drivetrain-model.html
+      // x and y:          0.001 m
+      // heading:          0.001 rad
+      // l and r velocity: 0.1   m/s
+      // l and r position: 0.005 m
+    // VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
   }
 
   /** @param motor Motor to configure with common settings */
@@ -319,10 +351,20 @@ public class DriveTrain extends SubsystemBase
   @Override
   public void periodic()
   {
+    // if (RobotBase.isSimulation())
+    // {
+    //   // Simulate voltage of motors.
+    //   // Polarity based on trial & error
+    //   final double simulated_voltage = RobotController.getBatteryVoltage();
+    //   simulation.setInputs( left_main.get()  * simulated_voltage,
+    //                        -right_main.get() * simulated_voltage);
+    //   simulation.update(TimedRobot.kDefaultPeriod);
+    // }
+
     // Update position tracker
     odometry.update(Rotation2d.fromDegrees(getHeadingDegrees()),
                     getLeftPositionMeters(),
-                    getRightPositionMeters());                   
+                    getRightPositionMeters());          
 
     // Publish odometry X, Y, Angle
     Pose2d pose = odometry.getPoseMeters();
@@ -339,5 +381,13 @@ public class DriveTrain extends SubsystemBase
 
 
     // SmartDashboard.putNumber("Motor Voltage", left_main.getMotorOutputVoltage());
+  }
+
+  public Pose2d getPose()
+  {
+    // if (RobotBase.isSimulation())
+    //   return simulation.getPose();
+    // else
+      return odometry.getPoseMeters();
   }
 }

@@ -50,7 +50,7 @@ public class SimuRobotDrive extends BasicRobot
     public void simulationPeriodic()
     {
         // Drivetrain needs to update DifferentialDrivetainSim,
-        // then publish the simualted pose
-        // field.setRobotPose(drivetrain.getPose());
+        // then publish the simulated pose
+        // TODO field.setRobotPose(drivetrain.getPose());
     }
 }
