@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST Team 2393. All Rights Reserved.                   */
+/* Copyright (c) 2020-2021 FIRST Team 2393. All Rights Reserved.                   */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -100,6 +100,19 @@ public class BasicRobot extends TimedRobot
   /** Called periodically while in TEST mode */
   @Override
   public void testPeriodic()
+  {
+  }
+
+  /** Called at start of simulation */
+  @Override
+  public void simulationInit()
+  {
+    System.out.println("** Running in simulation **");
+  }
+
+  /** Called while in simulation after {mode}Periodic() */
+  @Override
+  public void simulationPeriodic()
   {
   }
 }

@@ -27,30 +27,11 @@ public class SimuRobotDrive extends BasicRobot
     private final DriveTrain drivetrain = new DriveTrain();
     private final Command joydrive = new DriveByJoystick(drivetrain);
 
-    // Addition for simulation
-    private final Field2d field = new Field2d();
-
-    @Override
-    public void robotInit()
-    {
-        super.robotInit();
-        SmartDashboard.putData(field);
-    }
-
     @Override
     public void teleopInit()
     {
         super.teleopInit();
+        drivetrain.reset();
         joydrive.schedule();
-    }
-
-    // Code run whenever/only in simulation.
-    // Seems to be called just _after_ teleopPeriodic()
-    @Override
-    public void simulationPeriodic()
-    {
-        // Drivetrain needs to update DifferentialDrivetainSim,
-        // then publish the simulated pose
-        // TODO field.setRobotPose(drivetrain.getPose());
     }
 }
