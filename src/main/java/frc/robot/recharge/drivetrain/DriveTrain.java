@@ -137,7 +137,7 @@ public class DriveTrain extends SubsystemBase
     // SmartDashboard.putData("Heading PID", heading_pid);
 
     // Create simulation
-    double wheelRadiusMeters = Units.inchesToMeters(8);
+    double wheelRadiusMeters = Units.inchesToMeters(8) / 2; // Radius, not diameter
     double massKg = 120;
   
     // Falcon encoder counts 2048 ticks per turn
@@ -147,9 +147,10 @@ public class DriveTrain extends SubsystemBase
     double gearing = (TICKS_PER_METER / 2048)  / ( 1 / wheelRadiusMeters); 
 
     // Moment of inertia (wild guess):
-    // Sum of  mass * r^2   with r being distance from rotational axis
-    double jKgMetersSquared = 6 * Math.pow(0.5, 2)   // 12 lbs battery
-                            + 4 * Math.pow(0.5, 2);  // Motors & gears ...
+    // Sum of  mass * r^2   with r being distance from rotational axis:
+    //   6 * Math.pow(0.5, 2)   // 12 lbs battery
+    // + 4 * Math.pow(0.5, 2);  // Motors & gears ... ?
+    double jKgMetersSquared = 0.1;
     simulation = new DifferentialDrivetrainSim(
      // Gearbox with 2 falcon motors per gear
      DCMotor.getFalcon500(2),
