@@ -57,7 +57,7 @@ public class DriveTrain extends SubsystemBase
   /** Trajectory config & constraints.
    *  Defines how fast this drivetrain can accelerate, run, turn.
    */
-  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(1, 0.5)
+  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(1.0, 0.5)
                                           .addConstraint(new CurvatureConstraint(45.0))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
@@ -227,13 +227,19 @@ public class DriveTrain extends SubsystemBase
   /** @return Left position (positive = forward) */
   public double getLeftPositionMeters()
   {
-    return left_main.getSelectedSensorPosition() / TICKS_PER_METER;
+    if (RobotBase.isSimulation())
+      return simulation.getLeftPositionMeters();
+    else
+      return left_main.getSelectedSensorPosition() / TICKS_PER_METER;
   }
 
   /** @return Right position (positive = forward) */
   public double getRightPositionMeters()
   {
-    return -right_main.getSelectedSensorPosition() / TICKS_PER_METER;
+    if (RobotBase.isSimulation())
+      return simulation.getRightPositionMeters();
+    else
+      return -right_main.getSelectedSensorPosition() / TICKS_PER_METER;
   }
 
   /** @return Averaged left/right position (positive = forward) */
@@ -272,6 +278,8 @@ public class DriveTrain extends SubsystemBase
    */
   public double getHeadingDegrees()
   {
+    if (RobotBase.isSimulation())
+      return simulation.getHeading().getDegrees();
     // XXXX Math.IEEEremainder(gyro.getAngle(), 360)  ?
     return -gyro.getAngle();
   }
@@ -303,13 +311,24 @@ public class DriveTrain extends SubsystemBase
    */
   public void driveSpeed(final double left_speed, final double right_speed)
   {
-    // Predict necessary voltage, add the PID correction
-    final double left_volt  = feed_forward.calculate(left_speed)
-                            + left_speed_pid.calculate(getLeftSpeedMetersPerSecond(), left_speed);
-    final double right_volt = feed_forward.calculate(right_speed)
-                            + right_speed_pid.calculate(getRightSpeedMetersPerSecond(), right_speed);
-  //  System.out.println("Speeds: " + left_volt + ", " + right_volt);
-    driveVoltage(left_volt, -right_volt);
+    if (RobotBase.isSimulation())
+    {
+      // Predict necessary voltage
+      final double left_volt  = feed_forward.calculate(left_speed);
+      final double right_volt = feed_forward.calculate(right_speed);
+      //  System.out.println("Speeds: " + left_volt + ", " + right_volt);
+      driveVoltage(left_volt, -right_volt);
+    }
+    else
+    {
+      // Predict necessary voltage, add the PID correction
+      final double left_volt  = feed_forward.calculate(left_speed)
+                              + left_speed_pid.calculate(getLeftSpeedMetersPerSecond(), left_speed);
+      final double right_volt = feed_forward.calculate(right_speed)
+                              + right_speed_pid.calculate(getRightSpeedMetersPerSecond(), right_speed);
+      //  System.out.println("Speeds: " + left_volt + ", " + right_volt);
+      driveVoltage(left_volt, -right_volt);
+    }
   }
 
   /** Direct control of left and right motors
@@ -374,19 +393,12 @@ public class DriveTrain extends SubsystemBase
       simulation.setInputs( left_main.get()  * simulated_voltage,
                            -right_main.get() * simulated_voltage);
       simulation.update(TimedRobot.kDefaultPeriod);
+    }
 
-      // Update odometry from simulation
-      odometry.update(simulation.getHeading(),
-                      simulation.getLeftPositionMeters(),
-                      simulation.getRightPositionMeters());
-    }
-    else
-    {
-      // Update position tracker from motor encoders and gyro
-      odometry.update(Rotation2d.fromDegrees(getHeadingDegrees()),
-                      getLeftPositionMeters(),
-                      getRightPositionMeters());          
-    }
+    // Update position tracker from motor encoders and gyro, or simulation
+    odometry.update(Rotation2d.fromDegrees(getHeadingDegrees()),
+                    getLeftPositionMeters(),
+                    getRightPositionMeters());          
 
     // Publish odometry X, Y, Angle
     Pose2d pose = odometry.getPoseMeters();
