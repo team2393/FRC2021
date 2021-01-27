@@ -389,10 +389,16 @@ public class DriveTrain extends SubsystemBase
 
     // Publish odometry X, Y, Angle
     Pose2d pose = odometry.getPoseMeters();
-    SmartDashboard.putNumber("X Position:", pose.getTranslation().getX());
-    SmartDashboard.putNumber("Y Position:", pose.getTranslation().getY());
+    SmartDashboard.putNumber("X Position:", pose.getX());
+    SmartDashboard.putNumber("Y Position:", pose.getY());
     SmartDashboard.putNumber("Angle: ", pose.getRotation().getDegrees());
-    field.setRobotPose(pose);
+
+    // Publish field position, relative to 'start' location
+    double start_x = 0.8;
+    double start_y = 2.3;
+    field.setRobotPose(start_x + pose.getX(),
+                       start_y + pose.getY(),
+                       pose.getRotation());
                     
     // SmartDashboard.putNumber("Position", getPositionMeters());
     // SmartDashboard.putNumber("Left Speed", getLeftSpeedMetersPerSecond());
