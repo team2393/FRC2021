@@ -20,7 +20,7 @@ public class Spinner
   private final WPI_TalonFX follower = new WPI_TalonFX(RobotMap.SHOOTER_SLAVE_MOTOR);
 
   /** Encoder ticks for one turn of the wheel */
-  private final static double TICK_PER_REVOLUTION = 3310 * 220/360;
+  private final static double TICK_PER_REVOLUTION = 1024;
   
   // FF & PID for shooter motor to set RPM
   // https://trickingrockstothink.com/blog_posts/2019/10/19/tuning_pid.html
@@ -28,11 +28,15 @@ public class Spinner
   /** Feed-forward velocity constant: Volts per RPM
    *  Voltage: 11.444091796875 RPM: 5253.412462908012
    *  Voltage: 11.6279296875 RPM: 5696.142433234421
+   *  5191.988130563798 
+   * 
+   * Dual motors: Voltage 12 RPM: 5159.643916913947 
    */
-  private double kV = 0.00188;
-  private double k0 = 0.76;
+  // private double kV = 0.00188;
+  public static double kV = 0.000954;
+  public static double k0 = 0.79;
   /** P gain */
-  private final PIDController pid = new PIDController(0.0025, 0, 0);
+  private final PIDController pid = new PIDController(0.001750, 0, 0);
 
   public Spinner()
   {
@@ -41,7 +45,7 @@ public class Spinner
     motor.setNeutralMode(NeutralMode.Coast);
     motor.setInverted(true);
     motor.setSelectedSensorPosition(0);
-    // motor.configOpenloopRamp(0.5);
+    motor.configOpenloopRamp(0.2);
     
     // Add second shooter motor
     follower.configFactoryDefault();
@@ -49,6 +53,7 @@ public class Spinner
     follower.setNeutralMode(NeutralMode.Coast);
     follower.setInverted(true);
     follower.follow(motor);
+    follower.configOpenloopRamp(0.5);
   }  
   
   public void configure(double kV, double P)

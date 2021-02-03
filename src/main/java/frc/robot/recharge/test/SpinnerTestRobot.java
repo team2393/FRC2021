@@ -7,6 +7,7 @@
 
 package frc.robot.recharge.test;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.BasicRobot;
@@ -24,25 +25,41 @@ public class SpinnerTestRobot extends BasicRobot
   public void robotInit()
   {
     super.robotInit();
-    SmartDashboard.setDefaultNumber("kV", 0.00188);
-    SmartDashboard.setDefaultNumber("P", 0.0);
+    SmartDashboard.setDefaultNumber("kV", Spinner.kV);
+    SmartDashboard.setDefaultNumber("P", 0.001750);
+    SmartDashboard.setDefaultNumber("Desired RPM", 1000);
+    SmartDashboard.setDefaultNumber("Battery Voltage", RobotController.getBatteryVoltage());
   }
-
+  
   @Override
   public void robotPeriodic()
   {
     super.robotPeriodic();
     SmartDashboard.putNumber("Angle", spinner.getAngle());
     SmartDashboard.putNumber("RPM", spinner.getRPM());
+    SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
   }
 
   @Override
   public void teleopPeriodic()
   {
     // +- 12 Volts based on joystick
-    voltage = (OI.getSpeed() * 12);
-    System.out.println("RPM: " + spinner.getRPM() + " Voltage: " + (voltage));
-    spinner.setVoltage(voltage);
+    // voltage = (OI.getSpeed() * 12);
+    // System.out.println("RPM: " + spinner.getRPM() + " Target Voltage: " + (voltage) + " Actual Voltage: " + RobotController.getBatteryVoltage());
+    // spinner.setVoltage(voltage);
+
+    double desired_rpm = SmartDashboard.getNumber("Desired RPM", 1000);
+
+    if (OI.isShootHeld())
+    {
+      spinner.setRPM(desired_rpm);
+    }
+    else
+    {
+      spinner.setRPM(0);
+    }
+    System.out.println("RPM: " + spinner.getRPM());
+
   }
 
   @Override
@@ -66,6 +83,8 @@ public class SpinnerTestRobot extends BasicRobot
     //   if (voltage > 12.1)
     //      voltage = 0.0;
     // }
+    //
+
 
     // Tune PID, then pick some reasonable RPM values between which to toggle
     spinner.configure(SmartDashboard.getNumber("kV", 0),
