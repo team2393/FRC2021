@@ -8,13 +8,16 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.recharge.Enterprise;
+import frc.robot.recharge.shooter.Spinner;
 import frc.robot.recharge.test.RotateToTargetTestRobot;
+import frc.robot.recharge.test.SpinnerTestRobot;
 
 /** 'main' class, selects which robot to run */
 public final class Main
 {
   public static void main(String... args)
   {
-    RobotBase.startRobot(RotateToTargetTestRobot::new);
+    RobotBase.startRobot(Enterprise::new);
   } 
 }
