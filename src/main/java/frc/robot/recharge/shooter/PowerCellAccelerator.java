@@ -36,7 +36,7 @@ public class PowerCellAccelerator extends SubsystemBase
   private final WPI_VictorSPX conveyor_bottom = new WPI_VictorSPX(RobotMap.CONVEYOR_BOTTOM); 
   
   // Sensors
-  private final DigitalInput shooter_sensor_ready = new DigitalInput(RobotMap.SHOOTER_SENSOR_READY);
+  // private final DigitalInput shooter_sensor_ready = new DigitalInput(RobotMap.SHOOTER_SENSOR_READY);
   private final DigitalInput shooter_sensor_eject = new DigitalInput(RobotMap.SHOOTER_SENSOR_EJECT);
   private final DigitalInput shooter_sensor_low_conveyor = new DigitalInput(RobotMap.SHOOTER_SENSOR_LOW_CONVEYOR);
 
@@ -52,35 +52,39 @@ public class PowerCellAccelerator extends SubsystemBase
   /** Minimum speed for shooting a ball as fraction of SHOOTER_RPM */
   public final static double MINIMUM_RPM_FRACTION = 0.99;
 
-  private boolean unjammer = false;
+  /** Possible States */
+  public enum State
+  {
+    OFF(true),
+    LOAD(true),
+    SPIN_UP(true),
+    EJECT(false),
+    HOT(false),
+    UN_JAM(true);
 
+    /** May somebody request entering this state?
+     *  Or do we automatically enter it?
+     */
+    public final boolean may_request;
 
-  /** Should we auto-load?
-   *  This will turn the conveyors on to get
-   *  balls to the low and 'ready' sensors
-   */
-  private boolean auto_load = true;
+    private State(boolean may_request)
+    {
+      this.may_request = may_request;
+    }
+  }
 
-  /** Should we feed the ejector spinner?
-   *  This will keep the top conveyor running
-   *  even if a ball is 'ready', i.e. move
-   *  the 'ready' ball on into the ejector.
-   */
-  private boolean feed_shooter = false;
+  /** Current state */
+  private State state = State.OFF;
 
-  /** Should we shoot?
-   *  This runs the ejector as requested
-   *  plus a little longer
-   */
-  private boolean shoot = false;
-  /** Timer started when 'shoot' clears to keep the ejector running */
+  /** Timer started when entering 'HOT' state to keep the ejector running */
   private final Timer keep_running_timer = new Timer();
 
   /** Timer for moving agitator up and down */
   private final Timer agitator_timer = new Timer();
 
-  /** Is the timer running? */
-  private boolean timer_on = false;
+  /** How long does the spinup take? */
+  private final Timer spinup_timer = new Timer();
+
 
   public PowerCellAccelerator()
   {
@@ -101,27 +105,41 @@ public class PowerCellAccelerator extends SubsystemBase
     motor.setInverted(true);
   }
   
-  /** @param enable Enable loading? */
-  public void enableLoad(final boolean enable)
+  public void setState(State desired)
   {
-    auto_load = enable;
+    if (desired.may_request)
+      state = desired;
+    else
+      throw new IllegalStateException("You can't change state from " + state + " to " + desired);
+    
+    if (state == State.SPIN_UP)
+    {
+      spinup_timer.reset();
+      spinup_timer.start();
+      System.out.println("SPIN UP");
+    }
   }
-
-  public void unjam(boolean unjamming_enabled)
+  
+  public State getState()
   {
-    unjammer = unjamming_enabled;
+    return state;
   }
 
   /** Move top conveyor */
-  public void moveTop(final double volt)
+  private void moveTop(final double volt)
   {
     conveyor_top.setVoltage(volt);
   }
   
   /** Move bottom conveyor */
-  public void moveBottom(final double volt)
+  private void moveBottom(final double volt)
   {
-    if (volt == 0)
+    conveyor_bottom.setVoltage(volt);
+  }
+
+  private void runAgitator(final boolean run)
+  {
+    if (run == false)
     {
       agitator.set(false);
       agitator_timer.reset();
@@ -145,13 +163,6 @@ public class PowerCellAccelerator extends SubsystemBase
         agitator_timer.start();
       }
     }
-    conveyor_bottom.setVoltage(volt);
-  }
-  
-  /** @return Is cell in "ready" position at end of vertical conveyor? */
-  public boolean isPowerCellReady()
-  {
-    return !shooter_sensor_ready.get();
   }
 
   /** @return Is there a cell at the end of the horizontal conveyor? */
@@ -160,35 +171,9 @@ public class PowerCellAccelerator extends SubsystemBase
     return !shooter_sensor_low_conveyor.get();
   }
 
-  /** Turn shooter 'on' or 'off'.
-   * 
-   *  When turned 'off', it actually remains
-   *  running for a few seconds so in case
-   *  we want to turn it 'on' again it's
-   *  already up to speed.
-   */
-  public void eject(final boolean on_off)
-  {
-    // If shooter was on and is now requested off,
-    // start timer so it keeps running for a little longer
-    if (shoot == true  &&  on_off == false)
-    {
-      keep_running_timer.reset();
-      keep_running_timer.start();
-      timer_on = true;
-    }
-        
-    shoot = on_off;
-  }
-
   public double getShooterRPM()
   {
     return shooter.getRPM();
-  }
-
-  public void feedEjector(final boolean do_it)
-  {
-    feed_shooter = do_it;
   }
 
   /** Returns true if a power cell is being shot */
@@ -200,48 +185,88 @@ public class PowerCellAccelerator extends SubsystemBase
   @Override
   public void periodic()
   {
-    if (unjammer)
+    if (state == State.OFF)
     {
       shooter.setVoltage(0);
-      shoot = false;
-      timer_on = false;
-      moveBottom(-CONVEYOR_VOLTAGE);
-      moveTop(-CONVEYOR_VOLTAGE);
-      return;
+      moveTop(0);
+      moveBottom(0);
+      runAgitator(false);
     }
 
-    // Run ejector if we're asked to do it,
-    // or for 2 more seconds after the last shot
-    // so it remains running through a series of shots
-    if (shoot  ||  (timer_on && !keep_running_timer.hasElapsed(2.0)))
+    if (state == State.LOAD)
+    {
+      shooter.setVoltage(0);
+      moveTop(0);
+      handleLoading();
+    }
+
+    if (state == State.SPIN_UP)
+    {
       shooter.setRPM(SHOOTER_RPM);
+      moveTop(0);
+      handleLoading();
+
+      // If fast enough, enter EJECT 
+      if (getShooterRPM() >= MINIMUM_RPM_FRACTION * SHOOTER_RPM)
+      {
+        state = State.EJECT;
+        System.out.println("EJECT at " + getShooterRPM() + " RPMs after spinup of " + spinup_timer.get() + " seconds");
+      }
+    }
+
+    if (state == State.EJECT)
+    {
+      shooter.setRPM(SHOOTER_RPM);
+      moveTop(CONVEYOR_VOLTAGE);
+      moveBottom(CONVEYOR_VOLTAGE);
+      runAgitator(! isLowConveyorFull());
+
+      // Has a ball been fired?
+      if (powerCellFired())
+      {
+        state = State.HOT;
+
+        // (Re-)start timer that keeps spinner running
+        keep_running_timer.reset();
+        keep_running_timer.start();
+        System.out.println("Shot at " + getShooterRPM() + " RPMs");
+      }
+    }
+
+    if (state == State.HOT)
+    {
+      shooter.setRPM(SHOOTER_RPM);
+      moveTop(0);
+      handleLoading();
+
+      if (keep_running_timer.hasElapsed(2.0))
+        state = State.LOAD;
+    }
+    
+    if (state == State.UN_JAM)
+    {
+      shooter.setVoltage(0);
+      // timer_on = false;
+      moveTop(-CONVEYOR_VOLTAGE);
+      moveBottom(-CONVEYOR_VOLTAGE);
+      runAgitator(false);
+    }
+
+    SmartDashboard.putNumber("RPM", getShooterRPM());
+  }
+
+  /** Run bottom conveyor and agitator until we have one ball (or more) */
+  private void handleLoading()
+  {
+    if (isLowConveyorFull())
+    {
+      moveBottom(0);
+      runAgitator(false);
+    }
     else
     {
-      shooter.setVoltage(0);
-      timer_on = false;
+      moveBottom(CONVEYOR_VOLTAGE);
+      runAgitator(true);
     }
-    SmartDashboard.putNumber("RPM", getShooterRPM());
-
-    if (auto_load)
-    {
-      // Keep horiz. belt moving until ball is in there,
-      // regardless of what the vertical conveyor and ejector are doing.
-      if (! isLowConveyorFull()  ||  ! isPowerCellReady())
-        moveBottom(CONVEYOR_VOLTAGE);
-      else
-        moveBottom(0);
-
-      // Move vertical belt to feed a ball to the shooter,
-      // or until a ball is ready for the next shot
-      if (feed_shooter   ||   ! isPowerCellReady())
-        moveTop(CONVEYOR_VOLTAGE);
-      else
-        moveTop(0);
-     }
-     else
-     {
-       moveTop(0);
-       moveBottom(0);
-     }
   }
 }

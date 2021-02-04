@@ -167,7 +167,6 @@ public class Enterprise extends BasicRobot
   {
     super.robotPeriodic();
     
-    pca.unjam(OI.getUnjam());
     intake.unjam(OI.getUnjam());
 
     PowerCellAccelerator.SHOOTER_RPM = SmartDashboard.getNumber("Shooter RPM", PowerCellAccelerator.SHOOTER_RPM);
@@ -192,7 +191,7 @@ public class Enterprise extends BasicRobot
 
     // auto_shift.schedule();
     drive_mode.schedule();
-    pca.enableLoad(true);
+    pca.setState(PowerCellAccelerator.State.LOAD);
   }
   
   @Override
@@ -225,7 +224,10 @@ public class Enterprise extends BasicRobot
     // Disable climb control
     climb_idle.schedule();
 
-    pca.enableLoad(true);
+    if (OI.getUnjam())
+      pca.setState(PowerCellAccelerator.State.UN_JAM);
+    else if (pca.getState() == PowerCellAccelerator.State.UN_JAM)
+     pca.setState(PowerCellAccelerator.State.LOAD);
     
     // TODO Toggle hood solenoid with buttonboard
     if (OI.toggleHood())
@@ -233,8 +235,6 @@ public class Enterprise extends BasicRobot
         hood_up.schedule();
       else
         hood_down.schedule();
-
-    pca.eject(OI.prepareShooter());
 
     if (! auto_shift.isScheduled())
     {
@@ -256,14 +256,7 @@ public class Enterprise extends BasicRobot
 
     // Holding the 'shoot' button starts or re-starts the command to shoot one ball.
     if (OI.isShootHeld())
-    {
       eject.schedule();
-      // Rumble while shooting and there are still balls.
-      // Provides almost kind of quasi-haptic feedback of kickback
-      // from balls leaving robot.
-      if (pca.isPowerCellReady()  ||  pca.isLowConveyorFull())
-        rumble.schedule();
-    }
 
     // Align on target?
     if (OI.isAlignOnTargetHeld())
@@ -349,7 +342,7 @@ public class Enterprise extends BasicRobot
     intake.resetToStartPosition();
     drive_train.reset();
     drive_train.lock(true);
-    pca.enableLoad(true);
+    pca.setState(PowerCellAccelerator.State.LOAD);
     
     // Run the selected command.
     auto_commands.getSelected().schedule();
