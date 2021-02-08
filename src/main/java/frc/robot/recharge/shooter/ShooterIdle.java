@@ -8,6 +8,7 @@
 package frc.robot.recharge.shooter;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.recharge.shooter.PowerCellAccelerator.State;
 
 /** Turn conveyors etc. off */
 public class ShooterIdle extends InstantCommand
@@ -16,9 +17,7 @@ public class ShooterIdle extends InstantCommand
   {
     super(() ->
     {
-      pca.enableLoad(false);
-      pca.feedEjector(false);
-      pca.eject(false);
+      pca.setState(State.OFF);
     }, pca);
   }
 }
