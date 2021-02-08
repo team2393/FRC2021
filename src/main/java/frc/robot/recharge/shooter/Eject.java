@@ -31,6 +31,7 @@ public class Eject extends CommandBase
   @Override
   public void initialize()
   {
+    System.out.println("Started Eject");
     pca.setState(PowerCellAccelerator.State.SPIN_UP);
     timeout_timer.reset();
     timeout_timer.start();
@@ -52,5 +53,12 @@ public class Eject extends CommandBase
   {
      return timeout ||
             ! (pca.getState() == State.SPIN_UP  ||  pca.getState() == State.EJECT);
+  }
+
+  @Override
+  public void end(boolean interrupted) 
+  {
+    super.end(interrupted);
+    System.out.println("Ended Eject");
   }
 }
