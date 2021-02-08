@@ -36,7 +36,7 @@ public class PowerCellAccelerator extends SubsystemBase
   private final WPI_VictorSPX conveyor_bottom = new WPI_VictorSPX(RobotMap.CONVEYOR_BOTTOM); 
   
   // Sensors
-  // private final DigitalInput shooter_sensor_ready = new DigitalInput(RobotMap.SHOOTER_SENSOR_READY);
+  private final DigitalInput shooter_sensor_mid = new DigitalInput(RobotMap.SHOOTER_SENSOR_READY);
   private final DigitalInput shooter_sensor_eject = new DigitalInput(RobotMap.SHOOTER_SENSOR_EJECT);
   private final DigitalInput shooter_sensor_low_conveyor = new DigitalInput(RobotMap.SHOOTER_SENSOR_LOW_CONVEYOR);
 
@@ -168,7 +168,7 @@ public class PowerCellAccelerator extends SubsystemBase
   /** @return Is there a cell at the end of the horizontal conveyor? */
   public boolean isLowConveyorFull()
   {
-    return !shooter_sensor_low_conveyor.get();
+    return !shooter_sensor_low_conveyor.get() || !shooter_sensor_mid.get();
   }
 
   public double getShooterRPM()

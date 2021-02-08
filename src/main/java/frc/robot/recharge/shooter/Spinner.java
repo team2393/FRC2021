@@ -53,7 +53,7 @@ public class Spinner
     follower.setNeutralMode(NeutralMode.Coast);
     follower.setInverted(true);
     follower.follow(motor);
-    follower.configOpenloopRamp(0.5);
+    follower.configOpenloopRamp(0.2);
   }  
   
   public void configure(double kV, double P)
