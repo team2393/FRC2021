@@ -15,7 +15,6 @@ End 0 0 0
 
 # -----------------------------------------------------
 Auto Shoot Move Back
-Hood 140
 Shoot
 Wait 0.1
 Shoot
@@ -27,7 +26,7 @@ End -0.5 0 0
 
 # -----------------------------------------------------
 Auto Target Pickup Target
-Hood 140
+###Hood 140
 Shoot
 Wait 0.1
 Shoot
@@ -54,7 +53,7 @@ Shoot
 
 # -----------------------------------------------------
 Auto Right Pickup Target
-Hood 140
+##Hood 140
 IntakeDown
 ReversePoses
 End -4 0 0
@@ -74,7 +73,7 @@ Shoot
 
 # -----------------------------------------------------
 Auto Right Pickup Right of Target
-Hood 140
+##Hood 140
 IntakeDown
 ReversePoses
 End -3.1 0 0
