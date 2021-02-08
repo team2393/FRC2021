@@ -59,6 +59,6 @@ public class Eject extends CommandBase
   public void end(boolean interrupted) 
   {
     super.end(interrupted);
-    System.out.println("Ended Eject");
+    System.out.println("Ended Eject After " + timeout_timer.get() + " Seconds");
   }
 }

@@ -76,6 +76,10 @@ public class PowerCellAccelerator extends SubsystemBase
   /** Current state */
   private State state = State.OFF;
 
+  /** Last state */
+  private State last_state = null;
+
+
   /** Timer started when entering 'HOT' state to keep the ejector running */
   private final Timer keep_running_timer = new Timer();
 
@@ -111,13 +115,6 @@ public class PowerCellAccelerator extends SubsystemBase
       state = desired;
     else
       throw new IllegalStateException("You can't change state from " + state + " to " + desired);
-    
-    if (state == State.SPIN_UP)
-    {
-      spinup_timer.reset();
-      spinup_timer.start();
-      System.out.println("SPIN UP");
-    }
   }
   
   public State getState()
@@ -185,6 +182,10 @@ public class PowerCellAccelerator extends SubsystemBase
   @Override
   public void periodic()
   {
+    // Entering new state?
+    boolean enter = state != last_state;
+    last_state = state;
+
     if (state == State.OFF)
     {
       shooter.setVoltage(0);
@@ -201,7 +202,14 @@ public class PowerCellAccelerator extends SubsystemBase
     }
 
     if (state == State.SPIN_UP)
-    {
+    {    
+      if (enter)
+      {
+        spinup_timer.reset();
+        spinup_timer.start();
+        System.out.println("SPIN UP");
+      }
+
       shooter.setRPM(SHOOTER_RPM);
       moveTop(0);
       handleLoading();
@@ -210,6 +218,7 @@ public class PowerCellAccelerator extends SubsystemBase
       if (getShooterRPM() >= MINIMUM_RPM_FRACTION * SHOOTER_RPM)
       {
         state = State.EJECT;
+        enter = true;
         System.out.println("EJECT at " + getShooterRPM() + " RPMs after spinup of " + spinup_timer.get() + " seconds");
       }
     }
@@ -225,16 +234,20 @@ public class PowerCellAccelerator extends SubsystemBase
       if (powerCellFired())
       {
         state = State.HOT;
-
-        // (Re-)start timer that keeps spinner running
-        keep_running_timer.reset();
-        keep_running_timer.start();
-        System.out.println("Shot at " + getShooterRPM() + " RPMs");
+        enter = true;
       }
     }
 
     if (state == State.HOT)
     {
+      if (enter)
+      {
+        // (Re-)start timer that keeps spinner running
+        keep_running_timer.reset();
+        keep_running_timer.start();
+        System.out.println("Shot at " + getShooterRPM() + " RPMs");
+      }
+
       shooter.setRPM(SHOOTER_RPM);
       moveTop(0);
       handleLoading();
