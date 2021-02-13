@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.recharge.Enterprise;
 import frc.robot.recharge.shooter.Spinner;
+import frc.robot.recharge.test.CharacterizationRobot;
 import frc.robot.recharge.test.RotateToTargetTestRobot;
 import frc.robot.recharge.test.SpinnerTestRobot;
 

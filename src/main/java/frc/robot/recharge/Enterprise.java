@@ -32,6 +32,7 @@ import frc.robot.recharge.ctrlpanel.RotateWheel;
 import frc.robot.recharge.drivetrain.AutoShift;
 import frc.robot.recharge.drivetrain.DriveByJoystick;
 import frc.robot.recharge.drivetrain.DriveTrain;
+import frc.robot.recharge.drivetrain.Reset;
 import frc.robot.recharge.drivetrain.RotateToTarget;
 import frc.robot.recharge.shooter.Eject;
 import frc.robot.recharge.shooter.Hood;
@@ -55,6 +56,7 @@ public class Enterprise extends BasicRobot
   private CommandBase drive_mode = drive_by_joystick;
   // After align_on_target, return to current drive_mode
   private final CommandBase align_on_target = new RotateToTarget(drive_train);
+  private final CommandBase reset_drivetrain = new Reset(drive_train);
   
   private final Rumble rumble = new Rumble();
   
@@ -118,6 +120,9 @@ public class Enterprise extends BasicRobot
 
     // Place some commands on dashboard
     SmartDashboard.putData("Auto Shift", auto_shift);
+
+    SmartDashboard.putData("Reset Drive", reset_drivetrain);
+    
     // SmartDashboard.putData("Heading Hold", heading_hold);
     // SmartDashboard.putData("Drive by Joystick", drive_by_joystick);
     

@@ -14,6 +14,6 @@ public class Reset extends InstantCommand
 {
   public Reset(final DriveTrain drive_train) 
   {
-    super(drive_train::reset, drive_train);
+    super(drive_train::reset);
   }
 }

@@ -33,6 +33,7 @@ public class Eject extends CommandBase
   {
     System.out.println("Started Eject");
     pca.setState(PowerCellAccelerator.State.SPIN_UP);
+    timeout = false;
     timeout_timer.reset();
     timeout_timer.start();
   }
