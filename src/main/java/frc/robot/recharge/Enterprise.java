@@ -190,7 +190,8 @@ public class Enterprise extends BasicRobot
   public void teleopInit()
   {
     super.teleopInit();
-
+    intake.resetToStartPosition(); //TODO Don't use in competition
+ 
     drive_train.lock(true);
     OI.reset();
 

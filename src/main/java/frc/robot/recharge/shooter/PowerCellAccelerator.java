@@ -198,7 +198,16 @@ public class PowerCellAccelerator extends SubsystemBase
     {
       shooter.setVoltage(0);
       moveTop(0);
-      handleLoading();
+      if (isLowConveyorFull())
+      {
+        moveBottom(0);
+        runAgitator(false);
+      }
+      else
+      {
+        moveBottom(CONVEYOR_VOLTAGE);
+        runAgitator(true);
+      }
     }
 
     if (state == State.SPIN_UP)
@@ -212,7 +221,11 @@ public class PowerCellAccelerator extends SubsystemBase
 
       shooter.setRPM(SHOOTER_RPM);
       moveTop(0);
-      handleLoading();
+      runAgitator(true);
+      if (isLowConveyorFull())
+        moveBottom(0);
+      else
+        moveBottom(CONVEYOR_VOLTAGE);
 
       // If fast enough, enter EJECT 
       if (getShooterRPM() >= MINIMUM_RPM_FRACTION * SHOOTER_RPM)
@@ -228,7 +241,7 @@ public class PowerCellAccelerator extends SubsystemBase
       shooter.setRPM(SHOOTER_RPM);
       moveTop(CONVEYOR_VOLTAGE);
       moveBottom(CONVEYOR_VOLTAGE);
-      runAgitator(! isLowConveyorFull());
+      runAgitator(true);
 
       // Has a ball been fired?
       if (powerCellFired())
@@ -250,7 +263,16 @@ public class PowerCellAccelerator extends SubsystemBase
 
       shooter.setRPM(SHOOTER_RPM);
       moveTop(0);
-      handleLoading();
+      if (isLowConveyorFull())
+      {
+        moveBottom(0);
+        runAgitator(false);
+      }
+      else
+      {
+        moveBottom(CONVEYOR_VOLTAGE);
+        runAgitator(true);
+      }
 
       if (keep_running_timer.hasElapsed(2.0))
         state = State.LOAD;
@@ -266,20 +288,5 @@ public class PowerCellAccelerator extends SubsystemBase
     }
 
     SmartDashboard.putNumber("RPM", getShooterRPM());
-  }
-
-  /** Run bottom conveyor and agitator until we have one ball (or more) */
-  private void handleLoading()
-  {
-    if (isLowConveyorFull())
-    {
-      moveBottom(0);
-      runAgitator(false);
-    }
-    else
-    {
-      moveBottom(CONVEYOR_VOLTAGE);
-      runAgitator(true);
-    }
   }
 }
