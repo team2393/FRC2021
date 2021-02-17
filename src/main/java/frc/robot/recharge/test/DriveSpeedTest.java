@@ -20,36 +20,26 @@ import frc.robot.recharge.drivetrain.Reset;
 /**
  * Robot for 'Infinite Recharge' - R!$E2geTHeR#2020
  */
-public class EnterpriseDrive extends BasicRobot
+public class DriveSpeedTest extends BasicRobot
 { 
   private final DriveTrain drive_train = new DriveTrain();
 
   // Commands that require the drive train, i.e. starting any of these commands
   // will cancel whatever else was running and required the drive train
   private final CommandBase reset_drivetrain = new Reset(drive_train);
-  private final CommandBase drive_by_joystick = new DriveByJoystick(drive_train);
-  private final HeadingHold heading_hold = new HeadingHold(drive_train);
   /** Most recent drive mode, either drive_by_joystick or heading_hold */
-  private CommandBase drive_mode = heading_hold;
-
-  private final Rumble rumble = new Rumble();
   
-  // Shift commands can run concurrently with other commands that require the
-  // drive train
-  private final CommandBase shift_low = new InstantCommand(() -> drive_train.setGear(false));
-  private final CommandBase shift_high = new InstantCommand(() -> drive_train.setGear(true));
-  private final CommandBase auto_shift = new AutoShift(drive_train);
-
   @Override
   public void robotInit()
   {
     super.robotInit();
+    
+    SmartDashboard.setDefaultNumber("P Value", 0.0);
 
     // pcm.clearAllPCMStickyFaults();
 
     // Place some commands on dashboard
     SmartDashboard.putData("Reset Drive", reset_drivetrain);
-    SmartDashboard.putData("Auto Shift", auto_shift);
   }
 
   @Override
@@ -61,36 +51,10 @@ public class EnterpriseDrive extends BasicRobot
   @Override
   public void teleopInit()
   {
+    drive_train.lock(true);
     super.teleopInit();
     OI.reset();
-    auto_shift.schedule();
-    drive_mode.schedule();
-    drive_train.lock(true);
-  }
-  
-  @Override
-  public void teleopPeriodic()
-  {
-    // Control hood angle via manual entry on dashboard or ApplySettings()
-    teleop_drive();
-  }
-
-  private void teleop_drive()
-  {
-    
-    if (! auto_shift.isScheduled())
-    {
-      // Manual shifting
-      if (OI.isLowGearRequested())
-        shift_low.schedule();
-      else if (OI.isHighGearRequested())
-        shift_high.schedule();
-    }
-    
-    // Toggle between drive_by_joystick and heading_hold
-    OI.force_low_speed = false;
-    drive_mode.schedule();
-    
+    drive_train.setGear(false);
   }
   
   @Override
@@ -100,11 +64,20 @@ public class EnterpriseDrive extends BasicRobot
   }
 
   @Override
-  public void autonomousInit()
+  public void teleopPeriodic()
   {
-    super.autonomousInit();
+    // Control hood angle via manual entry on dashboard or ApplySettings()
+    double requested_speed = OI.getSpeed() * 3;
+    drive_train.driveSpeed(requested_speed, requested_speed);
+    double actual_speed = drive_train.getSpeedMetersPerSecond();
 
-    OI.reset();
-    drive_train.reset();
-   }
+    double speed_error = requested_speed - actual_speed;
+
+    SmartDashboard.putNumber("Actual Speed", actual_speed);
+    SmartDashboard.putNumber("Requested Speed", requested_speed);
+    SmartDashboard.putNumber("Speed Error", speed_error);
+
+    double p_value = SmartDashboard.getNumber("P Value", 0.0);
+    drive_train.configureP(p_value);
+  }
 }

@@ -52,13 +52,13 @@ public class DriveTrain extends SubsystemBase
 {  
   // Distance between left & right wheels is about 0.7m.
   // Value actually used is from from frc-characterization
-  public static final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.672);
+  public static final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7); //TODO 0.7
 
   /** Trajectory config & constraints.
    *  Defines how fast this drivetrain can accelerate, run, turn.
    */
-  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(2.0, 0.5)
-                                          .addConstraint(new CurvatureConstraint(45.0))
+  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(2.5, 0.5)
+                                          .addConstraint(new CurvatureConstraint(90.0))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
 
@@ -89,10 +89,10 @@ public class DriveTrain extends SubsystemBase
   private final PIDController heading_pid = new PIDController(0.01, 0.0, 0.005);
 
   // FF and PID (P only) from frc-characterization
-  private final SimpleMotorFeedforward feed_forward = new SimpleMotorFeedforward(0.846, 3.58, 0.175);
+  private final SimpleMotorFeedforward feed_forward = new SimpleMotorFeedforward(0.846, 3.58, 0.175); //TODO 0.6 3.7 0.37
   // Left & right speed PID
-  private final PIDController left_speed_pid = new PIDController(6.5, 0, 0);
-  private final PIDController right_speed_pid = new PIDController(6.5, 0, 0);
+  private final PIDController left_speed_pid = new PIDController(2, 0, 0);
+  private final PIDController right_speed_pid = new PIDController(2, 0, 0);
   
   // Track current position based on gyro and encoders
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
@@ -329,6 +329,12 @@ public class DriveTrain extends SubsystemBase
       //  System.out.println("Speeds: " + left_volt + ", " + right_volt);
       driveVoltage(left_volt, -right_volt);
     }
+  }
+
+  public void configureP(double p)
+  {
+    left_speed_pid.setP(p);
+    right_speed_pid.setP(p);
   }
 
   /** Direct control of left and right motors
