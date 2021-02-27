@@ -57,7 +57,7 @@ public class DriveTrain extends SubsystemBase
   /** Trajectory config & constraints.
    *  Defines how fast this drivetrain can accelerate, run, turn.
    */
-  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(3.5, 1.0)
+  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(3.0, 1.25)
                                           .addConstraint(new CurvatureConstraint(120.0))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
