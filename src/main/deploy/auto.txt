@@ -90,3 +90,20 @@ Wait 0.1
 Shoot
 Wait 0.1
 Shoot
+
+#--------------------------------------------------------
+Auto Micro Barrelet Run
+IntakeUp
+Poses
+Pose 2.55 0.2 0
+Pose 3.5 -0.5 -98
+Pose 2.6 -1.4 168
+Pose 2.3 -0.1 65
+Pose 4.8 0.2 37
+Pose 5.2 1.5 155
+Pose 3.6 1 -87
+Pose 3.9 -1 -58
+Pose 6 -1.1 48
+Pose 5.6 0 164
+Pose 4.1 -0.1 171
+End -0.26 -0.4 -180
