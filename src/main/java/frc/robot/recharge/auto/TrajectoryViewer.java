@@ -9,6 +9,9 @@ package frc.robot.recharge.auto;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 
 import javax.swing.JFrame;
@@ -104,13 +107,14 @@ public class TrajectoryViewer
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     frame.getContentPane().add(new JLabel(TrajectoryHelper.getEndInfo(trajectory)),
-                               BorderLayout.NORTH);
+                        BorderLayout.NORTH);
     
     frame.getContentPane().add(new TrajectoryPlot(),
                                BorderLayout.CENTER);
 
-    frame.getContentPane().add(new JLabel(String.format("Total time: %.2f seconds",
-                                                        trajectory.getTotalTimeSeconds())),
+    frame.getContentPane().add(new JLabel(String.format("Total time: %.2f seconds, max speed %.1f m/s",
+                                                        trajectory.getTotalTimeSeconds(),
+                                                        TrajectoryHelper.getMaxVelocity(trajectory))),
                                BorderLayout.SOUTH);
     frame.setBounds(10, 10, 600, 800);
     frame.setVisible(true);
@@ -134,9 +138,23 @@ public class TrajectoryViewer
     // final Pose2d end = new Pose2d(pos, Rotation2d.fromDegrees(0.0));
     // final Trajectory trajectory = TrajectoryGenerator.generateTrajectory(start, waypoints, end, config);
 
-    Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(Path.of("src/main/deploy/output/1MeterSwerve.wpilib.json"));
-    trajectory = trajectory.relativeTo(trajectory.sample(0).poseMeters);
-    trajectory = TrajectoryHelper.reverse(trajectory);
+    // Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(Path.of("src/main/deploy/output/1MeterSwerve.wpilib.json"));
+    // trajectory = trajectory.relativeTo(trajectory.sample(0).poseMeters);
+    // trajectory = TrajectoryHelper.reverse(trajectory);
+
+    // Open file
+    final BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/deploy/simu.txt")));
+    // Find desire Auto XXXX..
+    String line;
+    for (line = file.readLine();
+         line != null;
+         line = file.readLine())
+         if (line.contains("Auto Barrel"))
+            break;
+    line = file.readLine();
+    if (! line.contains("Poses"))
+        throw new Exception("Expect 'Poses', got " + line); 
+    Trajectory trajectory = TrajectoryReader.readPoses(file, false);
 
     // Show it
     new TrajectoryViewer(trajectory);

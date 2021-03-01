@@ -51,6 +51,18 @@ public class TrajectoryHelper
                          state.poseMeters.getRotation().getDegrees());
   }
 
+  public static double getMaxVelocity(final Trajectory trajectory)
+  {
+    double max_speed = 0.0;
+    for (State state : trajectory.getStates())
+    {
+      final double speed = Math.abs(state.velocityMetersPerSecond);
+      if (speed > max_speed)
+        max_speed = speed;
+    }
+    return max_speed;
+  }
+
   /** @param trajectory Trajectory;
    *  @return Info about end point
    */
