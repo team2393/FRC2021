@@ -143,17 +143,20 @@ public class TrajectoryViewer
     // trajectory = TrajectoryHelper.reverse(trajectory);
 
     // Open file
-    final BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/deploy/simu.txt")));
-    // Find desire Auto XXXX..
+    final BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/deploy/auto.txt")));
+    // Find desired Auto XXXX..
     String line;
     for (line = file.readLine();
          line != null;
          line = file.readLine())
-         if (line.contains("Auto Barrel"))
+         if (line.contains("Auto  Barrelet Run"))
             break;
-    line = file.readLine();
-    if (! line.contains("Poses"))
-        throw new Exception("Expect 'Poses', got " + line); 
+    // Skip to "Poses"
+    for (line = file.readLine();
+        line != null;
+        line = file.readLine())
+        if (line.contains("Poses"))
+            break;
     Trajectory trajectory = TrajectoryReader.readPoses(file, false);
 
     // Show it
