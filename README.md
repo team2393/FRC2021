@@ -9,19 +9,32 @@ FRC2021
 Setup
 -----
 
- * Optionally un-install existing NI tools
+To work on the software, you need to install the "WPILib", which includes
+Visual Studio Code, Java, and the robotics library.
+See
+https://docs.wpilib.org/en/latest/docs/zero-to-robot/step-2/wpilib-setup.html
+
+During the installation, you can un-check C++, the rest can remain
+on default settings.
+
+You also need 'git' from https://git-scm.com/downloads.
+
+Once you installed it, open the 'git bash' and type this to get a copy of the source code:
+
+```
+mkdir git
+cd git
+git clone https://github.com/team2393/FRC2021.git
+```
+
+Then you can open `2021 WPILib VS Code` from the desktop icon
+and use "File", "Open Folder" to open git/FRC2021 that you just fetched via the 'git bash'.
+
+The above is sufficient to read and work on all the source code.
+
+On a 'drive station' laptop that actually operates the robot you also need to install the following:
+
+ * Un-install existing NI tools in case you have them from last year
  * Open ni-frc-2020-game-tools_20.0.1_offline.iso to install NI tools
- * Open WPILib_Windows64-2021.2.1 to install WPILib (un-checked C++)
  * Open CTRE_Phoenix_Framework_v5.19.4.1 to install Phoenix tools
  
-Import of 2020 Sources
-----------------------
-
-Simply opening the existing "Folder" in VSCode triggered an 'import' dialog.
-Imported into a foler FRC2021.
-Build failed because of missing dependencies:
-
- * New Command lib and Phoenix could be added via Command, "WPILib: Manage Vendor Libs", Install offline
- * vendordeps/REVColorSensorV3.json was copied from old sources
- 
- Result compiles and deploys.
