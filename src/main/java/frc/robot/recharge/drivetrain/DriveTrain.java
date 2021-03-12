@@ -57,8 +57,8 @@ public class DriveTrain extends SubsystemBase
   /** Trajectory config & constraints.
    *  Defines how fast this drivetrain can accelerate, run, turn.
    */
-  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(3.0, 1.25)
-                                          .addConstraint(new CurvatureConstraint(120.0))
+  public static TrajectoryConfig trajectory_config = new TrajectoryConfig(3.0, 1.75)
+                                          .addConstraint(new CurvatureConstraint(170.0))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
 
@@ -420,7 +420,7 @@ public class DriveTrain extends SubsystemBase
                        pose.getRotation());
                     
     // SmartDashboard.putNumber("Position", getPositionMeters());
-    // SmartDashboard.putNumber("Left Speed", getLeftSpeedMetersPerSecond());
+    SmartDashboard.putNumber("Left Speed", getLeftSpeedMetersPerSecond());
     // SmartDashboard.putNumber("Right Speed", getRightSpeedMetersPerSecond());
     // SmartDashboard.putNumber("Heading", getHeadingDegrees());
 
