@@ -149,7 +149,7 @@ public class TrajectoryViewer
     for (line = file.readLine();
          line != null;
          line = file.readLine())
-         if (line.contains("Auto  Barrelet Run"))
+         if (line.contains("Auto  Slalom"))
             break;
     // Skip to "Poses"
     for (line = file.readLine();
