@@ -37,4 +37,8 @@ On a 'drive station' laptop that actually operates the robot you also need to in
  * Un-install existing NI tools in case you have them from last year
  * Open ni-frc-2020-game-tools_20.0.1_offline.iso to install NI tools
  * Open CTRE_Phoenix_Framework_v5.19.4.1 to install Phoenix tools
- 
+
+Issues
+======
+
+Windows crash related to nipcibrd.sys, https://forums.ni.com/t5/FIRST-Robotics-Competition/NIPCIBRD-SYS-causes-Windows-10-Blue-Screen-of-Death/td-p/3592852
