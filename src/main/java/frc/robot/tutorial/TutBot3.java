@@ -16,7 +16,8 @@ public class TutBot3 extends BasicRobot
     @Override
     public void autonomousPeriodic()
     {
-        double angle = Math.atan2(accel.getY(), accel.getZ()) / Math.PI * 180.0;
+        
+        double angle = Math.toDegrees(Math.atan2(accel.getY(), accel.getZ()) );
 
         System.out.printf("X= %4.1f, Y= %4.1f, Z= %4.1f  -> angle %4.0f\n",
                           accel.getX(), accel.getY(), accel.getZ(),
