@@ -237,10 +237,12 @@ public class Enterprise extends BasicRobot
     
     // TODO Toggle hood solenoid with buttonboard
     if (OI.toggleHood())
-      if (hood.getHoodPosition())
+    {
+      if (!hood.getHoodPosition())
         hood_up.schedule();
       else
         hood_down.schedule();
+    }
 
     if (! auto_shift.isScheduled())
     {
