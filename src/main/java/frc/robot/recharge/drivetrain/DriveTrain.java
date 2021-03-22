@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -59,6 +60,7 @@ public class DriveTrain extends SubsystemBase
    */
   public static TrajectoryConfig trajectory_config = new TrajectoryConfig(1.5, 1.0)
                                           .addConstraint(new CurvatureConstraint(100.0))
+                                          // .addConstraint(new CentripetalAccelerationConstraint(maxCentripetalAccelerationMetersPerSecondSq))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
 
