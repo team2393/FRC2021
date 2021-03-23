@@ -151,3 +151,19 @@ Pose 4 1.6 90
 End -0.1 2.3 -179
 ReversePoses 
 End -1 -2 90
+
+Auto RedA
+ReversePoses 
+End -1 0 0
+
+Auto RedB
+ReversePoses 
+End -1 0 0
+
+Auto BlueA
+ReversePoses 
+End -1 0 0
+
+Auto BlueB
+ReversePoses 
+End -1 0 0

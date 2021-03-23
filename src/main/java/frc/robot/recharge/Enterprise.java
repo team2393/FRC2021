@@ -8,6 +8,7 @@
 package frc.robot.recharge;
 
 import java.io.File;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.BasicRobot;
 import frc.robot.recharge.auto.ApplySettings;
 import frc.robot.recharge.auto.AutonomousBuilder;
@@ -97,7 +99,8 @@ public class Enterprise extends BasicRobot
   private final CommandBase near_settings = new ApplySettings("near.txt");
   private final CommandBase mid_settings = new ApplySettings("mid.txt");
   private final CommandBase far_settings = new ApplySettings("far.txt");
-    
+  
+  private List<SequentialCommandGroup> auto_moves;
   private final SendableChooser<Command> auto_commands = new SendableChooser<>();
 
   // Teleop modes
@@ -137,11 +140,13 @@ public class Enterprise extends BasicRobot
 
     // Auto options: Start with fixed options
     auto_commands.setDefaultOption("Nothing", new PrintCommand("Doing nothing"));
+    auto_commands.setDefaultOption("GalacticSearch", new PrintCommand("Should have detected galactic search path and color..."));
     try
     {
       // Add moves from auto.txt
       final File auto_file = new File(Filesystem.getDeployDirectory(), "auto.txt");
-      for (CommandBase moves : AutonomousBuilder.read(auto_file, drive_train, intake, pca, hood))
+      final List<SequentialCommandGroup> auto_moves = AutonomousBuilder.read(auto_file, drive_train, intake, pca, hood);
+      for (CommandBase moves : auto_moves)
         auto_commands.addOption(moves.getName(), moves);
     }
     catch (Exception ex)
@@ -353,7 +358,29 @@ public class Enterprise extends BasicRobot
     pca.setState(PowerCellAccelerator.State.LOAD);
     
     // Run the selected command.
-    auto_commands.getSelected().schedule();
+    Command selected = auto_commands.getSelected();
+    
+    // "GalacticSearch" is used to trigger automatic selection of "RedA", ..
+    if ("GalacticSearch".equals(selected.getName()))
+    {
+      // TODO Determine which path to use based on location of first ball
+      String path = "";
+      final double distance = SmartDashboard.getNumber("Distance", -100);
+      if (100 < distance  &&  distance < 120)
+        path = "RedA";
+      // else if ...  "RedB", "BlueA", "BlueB"
+
+      // Find auto with that name
+      for (Command command : auto_moves)
+      {
+        if (path.equals(command.getName()))
+        {
+          selected = command;
+          break;
+        }
+      }
+    }
+    selected.schedule();
   }
 
   @Override
