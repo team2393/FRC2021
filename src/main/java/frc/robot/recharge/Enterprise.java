@@ -140,7 +140,9 @@ public class Enterprise extends BasicRobot
 
     // Auto options: Start with fixed options
     auto_commands.setDefaultOption("Nothing", new PrintCommand("Doing nothing"));
-    auto_commands.setDefaultOption("GalacticSearch", new PrintCommand("Should have detected galactic search path and color..."));
+    PrintCommand gs = new PrintCommand("Should have detected galactic search path and color...");
+    gs.setName("GalacticSearch");
+    auto_commands.setDefaultOption("GalacticSearch", gs);
     try
     {
       // Add moves from auto.txt
@@ -359,26 +361,42 @@ public class Enterprise extends BasicRobot
     
     // Run the selected command.
     Command selected = auto_commands.getSelected();
-    
+    System.out.println ("the selected command is " + selected.getName ());
     // "GalacticSearch" is used to trigger automatic selection of "RedA", ..
     if ("GalacticSearch".equals(selected.getName()))
     {
+      System.out.println ("Starting to look for path");
       // TODO Determine which path to use based on location of first ball
       String path = "";
-      final double distance = SmartDashboard.getNumber("Distance", -100);
-      if (100 < distance  &&  distance < 120)
-        path = "RedA";
-      // else if ...  "RedB", "BlueA", "BlueB"
 
-      // Find auto with that name
-      for (Command command : auto_moves)
+      if ( SmartDashboard.getNumber ("Area",0) <= 0)
       {
-        if (path.equals(command.getName()))
-        {
-          selected = command;
-          break;
-        }
+        path="no idea";
       }
+      else
+      {
+        final double distance = SmartDashboard.getNumber("Distance", 0);        
+        final double direction = SmartDashboard.getNumber("Direction", 0);
+
+        if (Math.abs (distance-0)<10 && Math.abs(direction-0)<10)
+          path = "RedA";
+        else if (Math.abs (distance-0)<10 && Math.abs(direction-(-120))<10)
+          path = "RedB";
+        else if (Math.abs (distance-60)<10 && Math.abs(direction-50) <10)
+          path = "BlueB";
+        else path="BlueA";  
+      }
+
+      System.out.println ("the detected path is "+ path);
+      // Find auto with that name
+      // for (Command command : auto_moves)
+      // {
+      //   if (path.equals(command.getName()))
+      //   {
+      //     selected = command;
+      //     break;
+      //   }
+      // }
     }
     selected.schedule();
   }

@@ -4,3 +4,17 @@
 # but don't do that.
 Teleop Hood Setpoint 0
 Shooter RPM 5500
+
+# For 'Galactic Search' camera usage
+HueMin 20
+HueMax 34.0
+SatMin 50
+SatMax 255
+ValMin 170
+ValMax 255
+AspectMin 0.8
+AspectMax 1.4
+AreaMin 0
+AreaMax 500
+FullnessMin 55
+FullnessMax 100
