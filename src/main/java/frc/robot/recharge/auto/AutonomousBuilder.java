@@ -73,7 +73,7 @@ public class AutonomousBuilder
         { // Auto Name-of-this-sequence:
           // Start new auto
           current_auto = new SequentialCommandGroup();
-          current_auto.setName(scanner.nextLine());
+          current_auto.setName(scanner.nextLine().trim());
           autos.add(current_auto);
           // Initial position at start of autonomous
           nominal = new Pose2d();

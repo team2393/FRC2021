@@ -6,7 +6,7 @@ Teleop Hood Setpoint 0
 Shooter RPM 5500
 
 # For 'Galactic Search' camera usage
-HueMin 20
+HueMin 10
 HueMax 34.0
 SatMin 50
 SatMax 255

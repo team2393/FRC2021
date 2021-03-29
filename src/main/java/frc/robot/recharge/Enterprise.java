@@ -142,12 +142,12 @@ public class Enterprise extends BasicRobot
     auto_commands.setDefaultOption("Nothing", new PrintCommand("Doing nothing"));
     PrintCommand gs = new PrintCommand("Should have detected galactic search path and color...");
     gs.setName("GalacticSearch");
-    auto_commands.setDefaultOption("GalacticSearch", gs);
+    auto_commands.addOption("GalacticSearch", gs);
     try
     {
       // Add moves from auto.txt
       final File auto_file = new File(Filesystem.getDeployDirectory(), "auto.txt");
-      final List<SequentialCommandGroup> auto_moves = AutonomousBuilder.read(auto_file, drive_train, intake, pca, hood);
+      auto_moves = AutonomousBuilder.read(auto_file, drive_train, intake, pca, hood);
       for (CommandBase moves : auto_moves)
         auto_commands.addOption(moves.getName(), moves);
     }
@@ -363,7 +363,8 @@ public class Enterprise extends BasicRobot
     Command selected = auto_commands.getSelected();
     System.out.println ("the selected command is " + selected.getName ());
     // "GalacticSearch" is used to trigger automatic selection of "RedA", ..
-    if ("GalacticSearch".equals(selected.getName()))
+
+    if ("GalacticSearch".equals(selected.getName()))    
     {
       System.out.println ("Starting to look for path");
       // TODO Determine which path to use based on location of first ball
@@ -380,23 +381,31 @@ public class Enterprise extends BasicRobot
 
         if (Math.abs (distance-0)<10 && Math.abs(direction-0)<10)
           path = "RedA";
-        else if (Math.abs (distance-0)<10 && Math.abs(direction-(-120))<10)
+        else if (Math.abs (distance-52)<10 && Math.abs(direction-(70))<10)
           path = "RedB";
         else if (Math.abs (distance-60)<10 && Math.abs(direction-50) <10)
           path = "BlueB";
+        else if (Math.abs (distance-76)<10 && Math.abs(direction-(-47)) <10)
+          path = "RedB";
         else path="BlueA";  
       }
 
-      System.out.println ("the detected path is "+ path);
+      // path = "RedB";
+       
+      System.out.println("\n\n\n**************************************************************************");
+      System.out.println ("the detected path is '"+ path + "'");
+      System.out.println("**************************************************************************\n\n\n");
+
       // Find auto with that name
-      // for (Command command : auto_moves)
-      // {
-      //   if (path.equals(command.getName()))
-      //   {
-      //     selected = command;
-      //     break;
-      //   }
-      // }
+      for (Command command : auto_moves)
+      {
+        // System.out.println("Checking '" + command.getName() + "'");
+        if (path.equals(command.getName()))
+        {
+          selected = command;
+          break;
+        }
+      }
     }
     selected.schedule();
   }

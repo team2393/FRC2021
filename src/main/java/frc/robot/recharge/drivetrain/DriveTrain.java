@@ -59,7 +59,7 @@ public class DriveTrain extends SubsystemBase
    *  Defines how fast this drivetrain can accelerate, run, turn.
    */
   public static TrajectoryConfig trajectory_config = new TrajectoryConfig(1.5, 1.0)
-                                          .addConstraint(new CurvatureConstraint(100.0))
+                                          .addConstraint(new CurvatureConstraint(45.0))
                                           // .addConstraint(new CentripetalAccelerationConstraint(maxCentripetalAccelerationMetersPerSecondSq))
                                           .setKinematics(DriveTrain.kinematics)
                                           ;
@@ -376,9 +376,9 @@ public class DriveTrain extends SubsystemBase
   {
     final BiConsumer<Double, Double> setSpeedsButCarefully = (left_speed, right_speed) ->
     {
-      if (Math.abs(left_speed) > 0.9  ||
-          Math.abs(right_speed) > 0.9)
-          System.out.println("Ramsete asks us to go at " + left_speed + " resp. " + right_speed + "m/s");
+      // if (Math.abs(left_speed) > 0.9  ||
+      //     Math.abs(right_speed) > 0.9)
+      //     System.out.println("Ramsete asks us to go at " + left_speed + " resp. " + right_speed + "m/s");
       driveSpeed(left_speed, right_speed);
     };
 
