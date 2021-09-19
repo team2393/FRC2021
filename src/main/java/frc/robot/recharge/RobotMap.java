@@ -80,7 +80,7 @@ public class RobotMap
   public final static int SHOOTER_SENSOR_EJECT = 2;
 
   // Limit switch that detects when intake is all the way 'up'
-  public final static int INTAKE_HOME_SENSOR = 5; // TODO Use correct DIO channel!
+  public final static int INTAKE_HOME_SENSOR = 4;
   
   // PWM port for LED Strip
   public static final int LED_STRIP = 8;
