@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +38,19 @@ public class Intake extends SubsystemBase
   // https://trickingrockstothink.com/blog_posts/2019/10/26/controls_supp_arm.html
   private ArmFeedforward angle_ff = new ArmFeedforward(0.0, 1.0, 0.0);
   private final PIDController angle_pid = new PIDController(0.3, 0, 0);
+
+  // Homing switch at 'up' end of movement range, defines '75 degrees'
+  private final DigitalInput at_home = new DigitalInput(RobotMap.INTAKE_HOME_SENSOR);
+
+  // Should we move the intake to the 'home' position at limit switch?
+  private boolean homing = false;
+
+  // Timer for aborting the homing operation
+  private Timer homing_timer = new Timer();
+
+  // Did we try to home, but timed out, so we don't know the current angle
+  // and should thus give up instead of damaging the motors?
+  private boolean hopeless = false;
 
   private boolean run_spinner = false;
   private boolean unjam = false;
@@ -66,6 +80,15 @@ public class Intake extends SubsystemBase
   /** Offset to get 0 degree == horizontal */
   private double offset = 18.5;
 
+  /** Move 'up' until hitting homing switch, declare that 'up' (75 degrees) */
+  public void startHoming()
+  {
+    homing = true;
+    homing_timer.stop();
+    homing_timer.reset();
+    homing_timer.start();
+  }
+
   /** In theory, the absolute encoder knows the exact angle.
    *  We only need to correct for a fixed offset angle depending
    *  on how the encoder magnet is mounted in the encoder.
@@ -75,7 +98,7 @@ public class Intake extends SubsystemBase
    *  robot frame and then calling this will re-initialize
    *  the offset.
    */
-  public void resetToStartPosition()
+  private void resetToStartPosition()
   {
     // Get angle reading without offset
     offset = 0;
@@ -143,6 +166,17 @@ public class Intake extends SubsystemBase
   @Override
   public void periodic()
   {
+    if (hopeless)
+    {
+      // Homing failed, we don't know the angle,
+      // so cannot move up/down without risking damage
+      // --> Turn all off.
+      // Must fix and then power-cycle robot
+      spinner.setVoltage(0);
+      rotator.setVoltage(0);
+      return;
+    }
+    
     if (unjam)
     {
       spinner.setVoltage(11);
@@ -156,7 +190,56 @@ public class Intake extends SubsystemBase
       spinner.setVoltage(run_spinner ? speed : 0.0);
     }
     
-    if (desired_angle >= 0)
+    if (homing)
+    {
+      if (homing_timer.hasElapsed(10))
+      {
+        // We don't hit the limit switch?
+        // Stop, since something is wrong.
+        // You can still drive/shoot/climb,
+        // but we cannot use the intake
+        System.out.println("#################################");
+        System.out.println("#################################");
+        System.out.println("#################################");
+        System.out.println("#################################");
+        System.out.println("##  TIMEOUT WHILE HOMING THE INTAKE");
+        System.out.println("##  I GIVE UP. CHECK THE INTAKE,");
+        System.out.println("##  POWER-CYCLE ROBOT TO TRY AGAIN");
+        System.out.println("#################################");
+        hopeless = true;
+        return;
+      }
+      // Move 'up' until we hit the homing switch
+      // '0 degree' is all the way down,
+      // '75 degrees' is mostly up.
+      //
+      // angle_pid basically uses
+      // voltage = 0.3*(desired_angle - getAngle()),
+      // so if desired is 75, actual angle 10,
+      // it would generate a positive voltage to move 'up'.
+      // Below, we clamp that to the +-3V range.
+      // Move up slowly by using 2V?
+      rotator.setVoltage(2.0);
+
+      // TODO Is the switch reporting true or false when hit?
+      // Here we assume a switch that is "normally open",
+      // it closes when hit, and thus returns true when hit.
+      // But that means a broken/disconnected switch/dscable would never
+      // report close/true. 
+      // A fail-safe switch should be "normally closed",
+      // reporting true until it's hit, whereupon it opens
+      // and thus reports false.
+      if (at_home.get() == true)
+      {
+        // We're at the homing switch. Stop mmotor
+        rotator.setVoltage(0);
+        homing = false;
+        // Declare this '75 degrees'
+        resetToStartPosition();
+        // Next iteration, we'll move to the 'desired_angle'
+      }
+    }
+    else if (desired_angle >= 0)
     {
       // If the desired angle is low (put arm out),
       // and the actual angle is as well,
