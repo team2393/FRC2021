@@ -50,7 +50,7 @@ import frc.robot.recharge.shooter.ShooterIdle;
 public class Enterprise extends BasicRobot
 { 
   private final DriveTrain drive_train = new DriveTrain();
-
+  
   // Commands that require the drive train, i.e. starting any of these commands
   // will cancel whatever else was running and required the drive train
   private final CommandBase drive_by_joystick = new DriveByJoystick(drive_train);
@@ -126,6 +126,8 @@ public class Enterprise extends BasicRobot
 
     SmartDashboard.putData("Reset Drive", reset_drivetrain);
     
+    SmartDashboard.putBoolean("Low Power", false);
+
     // SmartDashboard.putData("Heading Hold", heading_hold);
     // SmartDashboard.putData("Drive by Joystick", drive_by_joystick);
     
@@ -197,7 +199,7 @@ public class Enterprise extends BasicRobot
   public void teleopInit()
   {
     super.teleopInit();
-    intake.resetToStartPosition(); //TODO Don't use in competition
+    // intake.resetToStartPosition(); //TODO Don't use in competition
     intake_up.schedule();
     drive_train.lock(true);
     OI.reset();
