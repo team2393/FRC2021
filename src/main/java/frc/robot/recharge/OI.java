@@ -69,7 +69,8 @@ public class OI
 
   public static boolean getUnjam()
   {
-    return buttonboard.getRawButton(11);
+    // Down arrow on D-Pad or Unjam button on buttonboard can be used to unjam
+    return (joystick.getPOV() == 180 || buttonboard.getRawButton(11));
   }
   
   public static boolean isLowGearRequested()
@@ -87,7 +88,7 @@ public class OI
   private static double getSpeedFactor()
   {
     if (force_low_speed  ||  joystick.getTriggerAxis(Hand.kRight) > 0.6)
-      return 0.5;
+      return 0.3;
     else
       return 1;
   }
