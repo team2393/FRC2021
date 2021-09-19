@@ -12,8 +12,10 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.recharge.RobotMap;
@@ -39,7 +41,7 @@ public class Intake extends SubsystemBase
   private boolean run_spinner = false;
   private boolean unjam = false;
 
-  /** Desired arm/rotator angle. Negative to disable PID */
+   /** Desired arm/rotator angle. Negative to disable PID */
   private double desired_angle = -1;
 
   public Intake()
@@ -147,8 +149,11 @@ public class Intake extends SubsystemBase
     }
     else
     {
+      int speed = -12;
+      if (SmartDashboard.getBoolean("Low Power", false))
+        speed = -6;
       // Spin intake rollers at good speed
-      spinner.setVoltage(run_spinner ? -12.0 : 0.0);
+      spinner.setVoltage(run_spinner ? speed : 0.0);
     }
     
     if (desired_angle >= 0)
@@ -162,7 +167,20 @@ public class Intake extends SubsystemBase
       {
         final double correction = angle_pid.calculate(getAngle(), desired_angle);
         final double preset = angle_ff.calculate(Math.toRadians(desired_angle), 0);
-        rotator.setVoltage(MathUtil.clamp((preset + correction), -3, 3));
+        // This is sloppy but I'm tired ¯\_(ツ)_/¯
+        int low = -6;
+        int high = 6;
+        if (SmartDashboard.getBoolean("Low Power", false))
+        {
+          low = -3;
+          high = 3;
+        }
+        else
+        {
+          low = -6;
+          high = 6;
+        }
+        rotator.setVoltage(MathUtil.clamp((preset + correction), low, high));
       }
     }
   }

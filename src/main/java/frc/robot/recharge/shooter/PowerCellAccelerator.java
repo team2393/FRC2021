@@ -44,7 +44,7 @@ public class PowerCellAccelerator extends SubsystemBase
   private final Solenoid agitator = new Solenoid(RobotMap.INTAKE_AGITATOR);
 
   /** Normal voltage for moving conveyors */
-  public final static double CONVEYOR_VOLTAGE = 11.0;
+  public static double CONVEYOR_VOLTAGE = 11.0;
 
   /** Ejector spinner setpoint */
   public static double SHOOTER_RPM = 5000;
@@ -129,8 +129,11 @@ public class PowerCellAccelerator extends SubsystemBase
   }
   
   /** Move bottom conveyor */
-  private void moveBottom(final double volt)
+  private void moveBottom(double volt)
   {
+    if (SmartDashboard.getBoolean("Low Power", false))
+      volt = volt*0.65;
+
     conveyor_bottom.setVoltage(volt);
   }
 
