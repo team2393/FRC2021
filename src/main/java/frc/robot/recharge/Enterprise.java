@@ -197,7 +197,6 @@ public class Enterprise extends BasicRobot
   public void teleopInit()
   {
     super.teleopInit();
-    intake.resetToStartPosition(); //TODO Don't use in competition
     intake_up.schedule();
     drive_train.lock(true);
     OI.reset();
@@ -354,7 +353,18 @@ public class Enterprise extends BasicRobot
     OI.reset();
     SmartDashboard.putNumber("Teleop Hood Setpoint", -1);
     hood.set(false);
-    intake.resetToStartPosition();
+
+    // Start homing the intake.
+    // This will continue until it's done.
+    // A command to move intake up/down will set the 'desired_angle',
+    // and the Intake will move to that desired angle as soon as it's
+    // done homing.
+    // So yes, that means the intake won't allow up/down control right away,
+    // that will only take effect after 'homing', but we can already drive
+    // and shoot while the homing is going on, and 'intake_down' is very likely
+    // only needed a little later, by which time the homing should be done.
+    intake.startHoming();
+
     drive_train.reset();
     drive_train.lock(true);
     pca.setState(PowerCellAccelerator.State.LOAD);
